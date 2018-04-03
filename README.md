@@ -5,14 +5,14 @@
 - parent()
 - toString()
 - child(path)
-- set(data, callback)
-- push(data, callback)
+- set(data)
+- push(data)
 - setAuth(auth) // auth token form generator
 - unauth()
 
 ## Query
-- once(event, callback)
-- remove(callback)
+- once(event)
+- remove()
 - orderByKey()
 - orderByChild(path)
 - orderByValue()

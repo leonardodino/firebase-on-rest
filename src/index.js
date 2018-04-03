@@ -1,4 +1,5 @@
-var request = require('request');
+var parseURL = require('url').parse;
+var https = require('https');
 var tuid = require('timer-uid').tuid;
 var body2Query = require('body-to-query').body2Query;
 
@@ -99,42 +100,38 @@ FirebaseOnRest.prototype.equalTo = function(value) {
   return this;
 }
 
-FirebaseOnRest.prototype.push = function(data, cb) {
+FirebaseOnRest.prototype.push = function(data) {
   var ref = this.child(tuid());
   if(!data) return ref;
 
-  ref.set(data, cb);
+  return ref.set(data);
 }
 
 FirebaseOnRest.prototype.child = function(path) {
   return new FirebaseOnRest(this.uri + '/' + path, this._auth, this._token);
 }
 
-FirebaseOnRest.prototype.once = function(event, cb) {
+FirebaseOnRest.prototype.once = function(event) {
   if(event !== 'value') return;
-  cb = cb || noop;
   var self = this;
   var body = self._query;
   self._query = {};
-  rest.get(self, body, function(err, data) {
-    if(err) return cb(err);
-    cb(null, new DataSnapshot(self, data));
+  return rest.get(self, body).then(function(data) {
+    return new DataSnapshot(self, data);
   });
 }
 
-FirebaseOnRest.prototype.set = function(data, cb) {
-  rest.put(this, data, cb || noop);
+FirebaseOnRest.prototype.set = function(data) {
+  return rest.put(this, data);
 }
 
-FirebaseOnRest.prototype.update = function(data, cb) {
-  rest.patch(this, data, cb || noop);
+FirebaseOnRest.prototype.update = function(data) {
+  return rest.patch(this, data);
 }
 
-FirebaseOnRest.prototype.remove = function(cb) {
-  rest.delete(this, null, cb || noop);
+FirebaseOnRest.prototype.remove = function() {
+  return rest.delete(this);
 }
-
-function noop() {}
 
 function DataSnapshot(ref, data) {
   this._ref = ref;
@@ -158,37 +155,53 @@ DataSnapshot.prototype.numChildren = function() {
 }
 
 function restRequest(method) {
-  return function(ref, data, cb) {
-    cb = cb || noop;
-    data = data || {};
-    var opt = {
-      url: ref.uri + '.json',
-      method: method,
-      json: true
-    };
+  return function(ref, data) {
+    return new Promise(function(resolve, reject) {
+      data = data || {};
+      var body = null;
+      var url = parseURL(ref.uri);
+      var opt = {
+        headers: {},
+        host: url.hostname,
+        port: url.port,
+        path: url.path + '.json',
+        method: method
+      };
 
-    if(ref._token){
-      opt.headers = {'Authorization': 'Bearer ' + ref._token}
-    }
+      if(ref._token) {
+        opt.headers['Authorization'] = 'Bearer ' + ref._token;
+      }
 
-    if(['POST', 'PUT', 'PATCH'].indexOf(method) != -1) {
-      if(ref._auth) {
-        opt.url += '?auth=' + ref._auth;
+      if(['POST', 'PUT', 'PATCH'].indexOf(method) != -1) {
+        if(ref._auth) {
+          opt.path += '?auth=' + ref._auth;
+        }
+        opt.headers['Content-Length'] = Buffer.byteLength(body, 'utf8');
+        opt.headers['Content-Type'] = 'application/json';
+        body = JSON.stringify(data);
+      } else {
+        if(ref._auth) {
+          data.auth = ref._auth;
+        }
+        opt.path += body2Query(data);
       }
-      opt.body = data;
-    } else {
-      if(ref._auth) {
-        data.auth = ref._auth;
-      }
-      opt.url += body2Query(data);
-    }
 
-    request(opt, function(err, res, json) {
-      if(res.statusCode > 300) {
-        err = json || new Error('HTTP: ' + res.statusCode);
-        json = null;
-      }
-      cb(err, json);
+      var req = https.request(opt, function(res) {
+        if(res.statusCode >= 400) return reject(new Error('HTTP: ' + res.statusCode));
+        var buffer = '';
+        res.setEncoding('utf8');
+        res.on('data', function(chunk) {buffer += chunk});
+        res.on('end', function() {
+          try {
+            resolve(JSON.parse(buffer));
+          } catch(e) {
+            reject(e);
+          }
+        });
+      });
+      req.on('error', reject);
+      if(body) req.write(body);
+      req.end();
     });
   };
 }
