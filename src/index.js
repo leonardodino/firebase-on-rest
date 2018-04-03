@@ -112,38 +112,29 @@ FirebaseOnRest.prototype.child = function(path) {
 
 FirebaseOnRest.prototype.once = function(event, cb) {
   if(event !== 'value') return;
+  cb = cb || noop;
   var self = this;
   var body = self._query;
   self._query = {};
   rest.get(self, body, function(err, data) {
-    if(err) return console.log(err);
-
-    (cb || noop)(new DataSnapshot(self, data));
+    if(err) return cb(err);
+    cb(null, new DataSnapshot(self, data));
   });
 }
 
 FirebaseOnRest.prototype.set = function(data, cb) {
-  rest.put(this, data, onError(cb));
+  rest.put(this, data, cb || noop);
 }
 
 FirebaseOnRest.prototype.update = function(data, cb) {
-  rest.patch(this, data, onError(cb));
+  rest.patch(this, data, cb || noop);
 }
 
 FirebaseOnRest.prototype.remove = function(cb) {
-  rest.delete(this, null, onError(cb));
+  rest.delete(this, null, cb || noop);
 }
 
 function noop() {}
-
-function onError(cb) {
-  return function(err) {
-    if(err) {
-      console.log(err.error);
-      (cb || noop)(err);
-    }
-  };
-}
 
 function DataSnapshot(ref, data) {
   this._ref = ref;
@@ -194,7 +185,7 @@ function restRequest(method) {
 
     request(opt, function(err, res, json) {
       if(res.statusCode > 300) {
-        err = json;
+        err = json || new Error('HTTP: ' + res.statusCode);
         json = null;
       }
       cb(err, json);
