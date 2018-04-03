@@ -1,6 +1,6 @@
 {
   "name": "@leonardodino/firebase-on-rest",
-  "version": "1.2.4",
+  "version": "2.0.0",
   "description": "Firebase API base on REST",
   "main": "src/index.js",
   "scripts": {
