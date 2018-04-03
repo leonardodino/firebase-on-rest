@@ -18,12 +18,12 @@ function FirebaseOnRest(uri, auth, token){
 }
 
 FirebaseOnRest.prototype.setAuth = function(auth){
-	if(auth)this._auth = auth
+	if(auth) this._auth = auth
 	return this
 }
 
 FirebaseOnRest.prototype.setToken = function(token){
-	if(token)this._token = token
+	if(token) this._token = token
 	return this
 }
 
@@ -56,14 +56,14 @@ FirebaseOnRest.prototype.orderByChild = function(name){
 }
 
 FirebaseOnRest.prototype.limitToFirst = function(num){
-	if(!this._query.orderBy)this.orderByKey()
+	if(!this._query.orderBy) this.orderByKey()
 	delete this._query.limitToLast
 	this._query.limitToFirst = num
 	return this
 }
 
 FirebaseOnRest.prototype.limitToLast = function(num){
-	if(!this._query.orderBy)this.orderByKey()
+	if(!this._query.orderBy) this.orderByKey()
 	delete this._query.limitToFirst
 	this._query.limitToLast = num
 	return this

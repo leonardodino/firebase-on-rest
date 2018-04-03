@@ -6,7 +6,8 @@
       "before": false,
       "after": false,
       "overrides": {
-        "return": {"before": true}
+        "return": {"before": true},
+        "this": {"before": true}
       }
     }],
     "accessor-pairs": "error",
