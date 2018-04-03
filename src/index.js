@@ -10,14 +10,20 @@ var rest = {
   delete: restRequest('DELETE')
 };
 
-function FirebaseOnRest(uri, auth) {
+function FirebaseOnRest(uri, auth, token) {
   this.uri = uri.replace(/\/$/, '');
   this._query = {};
   this.setAuth(auth);
+  this.setToken(token);
 }
 
 FirebaseOnRest.prototype.setAuth = function(auth) {
   if(auth) this._auth = auth;
+  return this;
+}
+
+FirebaseOnRest.prototype.setToken = function(token) {
+  if(token) this._token = token;
   return this;
 }
 
@@ -35,13 +41,13 @@ FirebaseOnRest.prototype.key = function() {
 }
 
 FirebaseOnRest.prototype.root = function() {
-  return new FirebaseOnRest('https://' + this.uri.split('/')[2], this._auth);
+  return new FirebaseOnRest('https://' + this.uri.split('/')[2], this._auth, this._token);
 }
 
 FirebaseOnRest.prototype.parent = function() {
   var s = this.uri.split('/');
   s.pop();
-  return new FirebaseOnRest(s.join('/'), this._auth);
+  return new FirebaseOnRest(s.join('/'), this._auth, this._token);
 }
 
 FirebaseOnRest.prototype.orderByChild = function(name) {
@@ -101,7 +107,7 @@ FirebaseOnRest.prototype.push = function(data, cb) {
 }
 
 FirebaseOnRest.prototype.child = function(path) {
-  return new FirebaseOnRest(this.uri + '/' + path, this._auth);
+  return new FirebaseOnRest(this.uri + '/' + path, this._auth, this._token);
 }
 
 FirebaseOnRest.prototype.once = function(event, cb) {
@@ -169,6 +175,10 @@ function restRequest(method) {
       method: method,
       json: true
     };
+
+    if(ref._token){
+      opt.headers = {'Authorization': 'Bearer ' + ref._token}
+    }
 
     if(['POST', 'PUT', 'PATCH'].indexOf(method) != -1) {
       if(ref._auth) {
