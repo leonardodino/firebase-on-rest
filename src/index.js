@@ -1,6 +1,5 @@
-var request = require('request');
 var tuid = require('timer-uid').tuid;
-var body2Query = require('body-to-query').body2Query;
+var restRequest = require('./request');
 
 var rest = {
   get: restRequest('GET'),
@@ -99,42 +98,38 @@ FirebaseOnRest.prototype.equalTo = function(value) {
   return this;
 }
 
-FirebaseOnRest.prototype.push = function(data, cb) {
+FirebaseOnRest.prototype.push = function(data) {
   var ref = this.child(tuid());
   if(!data) return ref;
 
-  ref.set(data, cb);
+  return ref.set(data);
 }
 
 FirebaseOnRest.prototype.child = function(path) {
   return new FirebaseOnRest(this.uri + '/' + path, this._auth, this._token);
 }
 
-FirebaseOnRest.prototype.once = function(event, cb) {
+FirebaseOnRest.prototype.once = function(event) {
   if(event !== 'value') return;
-  cb = cb || noop;
   var self = this;
   var body = self._query;
   self._query = {};
-  rest.get(self, body, function(err, data) {
-    if(err) return cb(err);
-    cb(null, new DataSnapshot(self, data));
+  return rest.get(self, body).then(function(data) {
+    return new DataSnapshot(self, data);
   });
 }
 
-FirebaseOnRest.prototype.set = function(data, cb) {
-  rest.put(this, data, cb || noop);
+FirebaseOnRest.prototype.set = function(data) {
+  return rest.put(this, data);
 }
 
-FirebaseOnRest.prototype.update = function(data, cb) {
-  rest.patch(this, data, cb || noop);
+FirebaseOnRest.prototype.update = function(data) {
+  return rest.patch(this, data);
 }
 
-FirebaseOnRest.prototype.remove = function(cb) {
-  rest.delete(this, null, cb || noop);
+FirebaseOnRest.prototype.remove = function() {
+  return rest.delete(this);
 }
-
-function noop() {}
 
 function DataSnapshot(ref, data) {
   this._ref = ref;
@@ -155,42 +150,6 @@ DataSnapshot.prototype.ref = function() {
 
 DataSnapshot.prototype.numChildren = function() {
   return this._data ? Object.keys(this._data).length : 0;
-}
-
-function restRequest(method) {
-  return function(ref, data, cb) {
-    cb = cb || noop;
-    data = data || {};
-    var opt = {
-      url: ref.uri + '.json',
-      method: method,
-      json: true
-    };
-
-    if(ref._token){
-      opt.headers = {'Authorization': 'Bearer ' + ref._token}
-    }
-
-    if(['POST', 'PUT', 'PATCH'].indexOf(method) != -1) {
-      if(ref._auth) {
-        opt.url += '?auth=' + ref._auth;
-      }
-      opt.body = data;
-    } else {
-      if(ref._auth) {
-        data.auth = ref._auth;
-      }
-      opt.url += body2Query(data);
-    }
-
-    request(opt, function(err, res, json) {
-      if(res.statusCode > 300) {
-        err = json || new Error('HTTP: ' + res.statusCode);
-        json = null;
-      }
-      cb(err, json);
-    });
-  };
 }
 
 module.exports = FirebaseOnRest;
