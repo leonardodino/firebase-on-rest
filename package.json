@@ -22,7 +22,6 @@
   "homepage": "https://github.com/leonardodino/firebase-on-rest#readme",
   "dependencies": {
     "body-to-query": "^1.0.0",
-    "request": "^2.72.0",
     "timer-uid": "^1.0.1"
   }
 }
