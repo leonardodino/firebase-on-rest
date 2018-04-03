@@ -1,6 +1,6 @@
 var parseURL = require('url').parse
 var https = require('https')
-var body2Query = require('body-to-query').body2Query
+var querystring = require('querystring')
 
 module.exports = function restRequest(method){
 	return function(ref, data){
@@ -33,7 +33,7 @@ module.exports = function restRequest(method){
 				if(ref._auth){
 					data.auth = ref._auth
 				}
-				opt.path += body2Query(data)
+				opt.path += '?' + querystring.stringify(data)
 			}
 
 			var req = https.request(opt, function(res){
