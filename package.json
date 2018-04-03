@@ -1,25 +1,25 @@
 {
-  "name": "firebase-on-rest",
-  "version": "1.2.2",
+  "name": "@leonardodino/firebase-on-rest",
+  "version": "1.2.3",
   "description": "Firebase API base on REST",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Warning: no test specified\" && exit 0"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wrenth04/firebase-on-rest.git"
+    "url": "git+https://github.com/leonardodino/firebase-on-rest.git"
   },
   "keywords": [
     "firebase",
     "rest"
   ],
-  "author": "Phil Huang (wrenth04@gmail.com)",
+  "author": "Leonardo Dino",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/wrenth04/firebase-on-rest/issues"
+    "url": "https://github.com/leonardodino/firebase-on-rest/issues"
   },
-  "homepage": "https://github.com/wrenth04/firebase-on-rest#readme",
+  "homepage": "https://github.com/leonardodino/firebase-on-rest#readme",
   "dependencies": {
     "body-to-query": "^1.0.0",
     "request": "^2.72.0",
