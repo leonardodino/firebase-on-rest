@@ -1,14 +1,14 @@
-let parseURL = require('url').parse
-let https = require('https')
-let body2Query = require('body-to-query').body2Query
+var parseURL = require('url').parse
+var https = require('https')
+var body2Query = require('body-to-query').body2Query
 
 module.exports = function restRequest(method){
 	return function(ref, data){
 		return new Promise(function(resolve, reject){
 			data = data || {}
-			let body = null
-			let url = parseURL(ref.uri)
-			let opt = {
+			var body = null
+			var url = parseURL(ref.uri)
+			var opt = {
 				headers: {},
 				host: url.hostname,
 				port: url.port,
@@ -36,9 +36,9 @@ module.exports = function restRequest(method){
 				opt.path += body2Query(data)
 			}
 
-			let req = https.request(opt, function(res){
+			var req = https.request(opt, function(res){
 				if(res.statusCode >= 400) return reject(new Error('HTTP: ' + res.statusCode))
-				let buffer = ''
+				var buffer = ''
 				res.setEncoding('utf8')
 				res.on('data', function(chunk){buffer += chunk})
 				res.on('end', function(){

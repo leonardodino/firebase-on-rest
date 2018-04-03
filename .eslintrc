@@ -162,7 +162,7 @@
     "no-useless-escape": "error",
     "no-useless-rename": "error",
     "no-useless-return": "error",
-    "no-var": "error",
+    "no-var": 0,
     "no-void": "error",
     "no-warning-comments": "error",
     "no-whitespace-before-property": "error",
@@ -208,7 +208,7 @@
       "never"
     ],
     "valid-jsdoc": "error",
-    "vars-on-top": "error",
+    "vars-on-top": 0,
     "wrap-iife": "error",
     "wrap-regex": "error",
     "yield-star-spacing": "error",

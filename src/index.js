@@ -1,8 +1,8 @@
-let tuid = require('timer-uid').tuid
-let restRequest = require('./request')
-let DataSnapshot = require('./snapshot')
+var tuid = require('timer-uid').tuid
+var restRequest = require('./request')
+var DataSnapshot = require('./snapshot')
 
-let rest = {
+var rest = {
 	get: restRequest('GET'),
 	post: restRequest('POST'),
 	put: restRequest('PUT'),
@@ -45,7 +45,7 @@ FirebaseOnRest.prototype.root = function(){
 }
 
 FirebaseOnRest.prototype.parent = function(){
-	let s = this.uri.split('/')
+	var s = this.uri.split('/')
 	s.pop()
 	return new FirebaseOnRest(s.join('/'), this._auth, this._token)
 }
@@ -100,7 +100,7 @@ FirebaseOnRest.prototype.equalTo = function(value){
 }
 
 FirebaseOnRest.prototype.push = function(data){
-	let ref = this.child(tuid())
+	var ref = this.child(tuid())
 	if(!data) return ref
 
 	return ref.set(data)
@@ -112,8 +112,8 @@ FirebaseOnRest.prototype.child = function(path){
 
 FirebaseOnRest.prototype.once = function(event){
 	if(event !== 'value') return
-	let self = this
-	let body = self._query
+	var self = this
+	var body = self._query
 	self._query = {}
 	return rest.get(self, body).then(function(data){
 		return new DataSnapshot(self, data)
