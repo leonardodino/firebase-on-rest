@@ -24,8 +24,5 @@
     "body-to-query": "^1.0.0",
     "request": "^2.72.0",
     "timer-uid": "^1.0.1"
-  },
-  "devDependencies": {
-    "eventsource": "^0.2.1"
   }
 }
