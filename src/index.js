@@ -132,4 +132,5 @@ FirebaseOnRest.prototype.remove = function(){
 	return rest.delete(this)
 }
 
+FirebaseOnRest.DataSnapshot = DataSnapshot
 module.exports = FirebaseOnRest
